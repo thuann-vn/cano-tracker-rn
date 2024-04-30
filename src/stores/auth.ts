@@ -5,6 +5,7 @@ type AuthState = 'logged-in' | 'logged-out';
 export class AuthStore implements IStore {
   state: AuthState = 'logged-out';
   email = '';
+  is_admin = false;
 
   // getters
   get stateStr() {
@@ -16,6 +17,7 @@ export class AuthStore implements IStore {
     this.setMany({
       state: 'logged-out',
       email: '',
+      is_admin: false
     });
   }
 
@@ -24,7 +26,7 @@ export class AuthStore implements IStore {
 
     makePersistable(this, {
       name: AuthStore.name,
-      properties: ['email', 'state'],
+      properties: ['email', 'state', 'is_admin'],
     });
   }
 

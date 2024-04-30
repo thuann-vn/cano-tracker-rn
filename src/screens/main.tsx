@@ -9,6 +9,8 @@ import { useAppearance } from '@app/utils/hooks';
 import MapView, { Marker } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
+import { AuthApi } from '@app/services/api/auth';
+import { useStores } from '@app/stores';
 
 const timeInterval = 5 //Call API to up location per 5s
 var centerMapTimeout = null
@@ -16,7 +18,9 @@ var centerMapTimeout = null
 export const Main: NavioScreen = observer(({ }) => {
   useAppearance();
   const navigation = useNavigation();
-
+  const { api } = useServices();
+  const { auth } = useStores();
+  console.log(auth)
   // State (local)
   const [loading, setLoading] = useState(false);
   const [currentInterval, setCurrentInterval] = useState(timeInterval)
@@ -26,6 +30,7 @@ export const Main: NavioScreen = observer(({ }) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   })
+  const [users, setUsers] = useState([])
 
   const mapRef = useRef()
   useEffect(() => {
@@ -35,32 +40,56 @@ export const Main: NavioScreen = observer(({ }) => {
   }, [])
 
   useEffect(() => {
-    let myInterval = setInterval(async () => {
-      if (currentInterval > 0) {
-        setCurrentInterval(currentInterval - 1)
-      }
-      if (currentInterval === 0) {
-        if (currentPosition) {
-          let location = await Location.getCurrentPositionAsync({});
-          setCurrentPosition({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          });
-
-          mapRef.current.animateToRegion({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude
-          }, 500)
+    let myInterval = null
+    if (auth.is_admin) {
+      myInterval = setInterval(async () => {
+        //Load users
+        const users = await api.auth.getUsers()
+        console.log(users)
+        setUsers(users)
+      }, 10000)
+    } else {
+      myInterval = setInterval(async () => {
+        if (currentInterval > 0) {
+          setCurrentInterval(currentInterval - 1)
         }
-        setCurrentInterval(timeInterval)
-      }
-    }, 1000)
+        if (currentInterval === 0) {
+          if (currentPosition) {
+            let location = await Location.getCurrentPositionAsync({});
+            setCurrentPosition({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            });
+
+            mapRef.current.animateToRegion({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude
+            }, 500)
+
+            //Call API
+            updateLocation(location.coords)
+          }
+          setCurrentInterval(timeInterval)
+        }
+      }, 10000)
+    }
+
     return () => {
       clearInterval(myInterval)
     }
   })
+
+
+  //Call API update location
+  const updateLocation = async (location) => {
+    api.auth.updateProfile({
+      lat: location.latitude,
+      lng: location.longitude,
+    })
+  }
+
   useEffect(() => {
     (async () => {
 

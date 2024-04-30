@@ -20,6 +20,7 @@ import {AppProvider} from '@app/utils/providers';
 import {useAppearance} from '@app/utils/hooks';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import axiosService from '@app/utils/axiosService';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -34,6 +35,7 @@ const requestPermissions = async () => {
     }
   }
 };
+
 TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (error) {
     // Error occurred - check `error.message` for more details.
@@ -42,7 +44,11 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (data) {
     const { locations } = data;
     // do something with the locations captured in the background
-    console.log(locations);
+    console.log('locations',locations);
+    axiosService.post('member/update', {
+      lat: locations[0].coords.latitude,
+      lng: locations[0].coords.longitude
+    });
   }
 });
 
