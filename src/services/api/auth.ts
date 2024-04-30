@@ -1,16 +1,30 @@
-import {sleep} from '@app/utils/help';
+import axiosService from '@app/utils/axiosService';
 import {Auth$Login$Response} from '@app/utils/types/api';
 
 export class AuthApi {
-  login = async (): Promise<Auth$Login$Response> => {
+  login = async (phone: string, password: string): Promise<Auth$Login$Response> => {
     // faking request
-    await sleep(1000); // sleeping for 1s
+    const result = await axiosService.post('login', {
+      phone, 
+      password
+    });
+    console.log(result)
+    if(result){
 
-    return {
-      status: 'success',
-      data: {
-        'some-session-info?': {},
-      },
-    };
+      return {
+        status: 'success',
+        data: {
+          'some-session-info?': {},
+        },
+      };
+    }else{
+      return {
+        status: 'fail',
+        data:{
+          'some-session-info?': {},
+        }
+      };
+    }
+
   };
 }

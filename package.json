@@ -38,6 +38,7 @@
     "@react-navigation/native-stack": "^6.9.0",
     "@react-navigation/stack": "^6.3.0",
     "@shopify/flash-list": "1.6.3",
+    "axios": "^1.6.8",
     "date-fns": "^2.29.3",
     "expo": "^50.0.14",
     "expo-application": "~5.8.3",

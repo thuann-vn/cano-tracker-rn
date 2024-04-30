@@ -35,7 +35,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
     setLoading(true);
 
     try {
-      const {status} = await api.auth.login(); // fake login
+      const {status} = await api.auth.login(auth.email, password); // fake login
 
       if (status === 'success') {
         // marking that we are logged in
@@ -72,11 +72,11 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
             >
               <View paddingH-s3 paddingV-s2 marginV-s4>
                 <TextInput
-                  placeholder={'Email'}
+                  placeholder={'Số điện thoại'}
                   value={auth.email}
                   onChangeText={setEmail}
-                  keyboardType="email-address"
-                  inputMode="email"
+                  keyboardType="phone-pad"
+                  inputMode="numeric"
                 />
               </View>
 
