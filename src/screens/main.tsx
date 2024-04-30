@@ -35,18 +35,19 @@ export const Main: NavioScreen = observer(({ }) => {
   const mapRef = useRef()
   useEffect(() => {
     navigation.setOptions({
-      title: "Vị trí của bạn"
+      title: auth.is_admin ? "Vị trí cano" : "Vị trí của bạn"
     })
+
+    if (auth.is_admin) {
+      fetchUsers()
+    }
   }, [])
 
   useEffect(() => {
     let myInterval = null
     if (auth.is_admin) {
       myInterval = setInterval(async () => {
-        //Load users
-        const users = await api.auth.getUsers()
-        console.log(users)
-        setUsers(users)
+        fetchUsers()
       }, 10000)
     } else {
       myInterval = setInterval(async () => {
@@ -81,6 +82,22 @@ export const Main: NavioScreen = observer(({ }) => {
     }
   })
 
+  //Fetch users locations
+  const fetchUsers = async () => {
+    const users = await api.auth.getUsers()
+    setUsers(users.data)
+    centerMapByCoordinates(users.data)
+  }
+
+  //Make map center
+  const centerMapByCoordinates = (users) => {
+    mapRef.current.fitToCoordinates(users.filter(user => user.lat && user.lng).map(user => ({
+      latitude: parseFloat(user.lat),
+      longitude: parseFloat(user.lng),
+    })), {
+      edgePadding: { top: 150, bottom: 150, left: 150, right: 150 }
+    })
+  }
 
   //Call API update location
   const updateLocation = async (location) => {
@@ -116,6 +133,7 @@ export const Main: NavioScreen = observer(({ }) => {
           height: '100%'
         }}
         initialRegion={currentPosition}
+        provider='google'
       >
         {
           currentPosition ? (
@@ -125,6 +143,20 @@ export const Main: NavioScreen = observer(({ }) => {
               <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
             </Marker.Animated>
           ) : null
+        }
+
+        {
+          users.filter(user => user.lat && user.lng).map((user, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(user.lat),
+                longitude: parseFloat(user.lng),
+              }}
+            >
+              <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
+            </Marker>
+          ))
         }
 
       </MapView>
