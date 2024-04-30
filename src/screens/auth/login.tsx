@@ -9,6 +9,7 @@ import {useStores} from '@app/stores';
 import {useServices} from '@app/services';
 import {useAppearance} from '@app/utils/hooks';
 import {BButton} from '@app/components/button';
+import { useNavigation } from '@react-navigation/native';
 
 export type Props = {
   type?: 'push';
@@ -18,6 +19,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
   useAppearance(); // for Dark Mode
   const {t, navio, api} = useServices();
   const {auth} = useStores();
+  const navigation = useNavigation();
 
   // State
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,11 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
   };
 
   // Methods
-  const configureUI = () => {};
+  const configureUI = () => {
+    navigation.setOptions({
+      title: "Đăng nhập"
+    });
+  };
 
   const setEmail = (v: string) => auth.set('email', v);
 
@@ -58,14 +64,6 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
     <View flex bg-bgColor>
       <ScrollView contentInsetAdjustmentBehavior="always">
         <View>
-          <View flex centerH marginT-30>
-            <Text text50>Login</Text>
-
-            <Text grey30 marginT-4>
-              just fill in any credentials
-            </Text>
-          </View>
-
           <View marginT-s6 centerH>
             <View
               paddingH-s4
@@ -88,7 +86,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
 
               <View paddingH-s3 paddingV-s2 marginV-s4>
                 <TextInput
-                  placeholder={'Password'}
+                  placeholder={'Mật khẩu'}
                   value={password}
                   onChangeText={setPassword}
                   keyboardType="visible-password"
@@ -97,7 +95,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({type = 'push'}) => {
               </View>
             </View>
 
-            <BButton label={loading ? 'Logging in ...' : 'Login'} onPress={login} />
+            <BButton label={loading ? 'Đang đăng nhập ...' : 'Đăng nhập'} onPress={login}/>
           </View>
         </View>
       </ScrollView>

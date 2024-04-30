@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Text, View} from 'react-native-ui-lib';
 import {observer} from 'mobx-react';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -11,7 +11,7 @@ import {useAppearance} from '@app/utils/hooks';
 import {Row} from '@app/components/row';
 import {Icon, IconName} from '@app/components/icon';
 import {Section} from '@app/components/section';
-import {Alert} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 type SectionData = {
   content: {
@@ -26,79 +26,35 @@ export const Playground: React.FC = observer(() => {
   useAppearance();
   const {navio} = useServices();
   const {auth} = useStores();
+  const navigation = useNavigation();
 
-  // Methods
-  const showFlashList = () => navio.push('PlaygroundFlashList');
-  const showExpoImage = () => navio.push('PlaygroundExpoImage');
-  const showDrawerWithTabs = () => {
-    Alert.alert('Uncomment related code in @app/navio.tsx and @app/screens/playground');
-    // uncomment related code in navio.tsx and below
-    // navio.setRoot('drawers', 'MainDrawer');
-  };
-  const showTabsWithDrawer = () => {
-    Alert.alert('Uncomment related code in @app/navio.tsx and @app/screens/playground');
-    // uncomment related code in navio.tsx and below
-    // navio.setRoot('tabs', 'TabsWithDrawer');
-  };
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Cài đặt"
+    })
+  }, [])
+  
 
   const showAuthFlow = () => {
     // logging out from previous session
     if (auth.state === 'logged-in') {
       auth.logout();
+      navio.setRoot('stacks', 'AuthFlow');
     } else {
-      // we can move `navio.setRoot` inside `auth.logout`
-      // but is left here for more clarity and simplicity
       navio.setRoot('stacks', 'AuthFlow');
     }
   };
 
-  // pushing stack will hide tabs on Product Page
-  const showProductPage = () => navio.stacks.push('ProductPageStack');
-
   // Memos
   const SectionsData: Record<string, SectionData> = {
-    Libraries: {
+    "Tài khoản": {
       content: [
         {
-          title: 'Flash List',
-          subtitle: 'by Shopify',
-          icon: 'list-outline',
-          onPress: showFlashList,
-        },
-        {
-          title: 'Expo Image',
-          subtitle: 'by Expo',
-          icon: 'image-outline',
-          onPress: showExpoImage,
-        },
-      ],
-    },
-    Navio: {
-      content: [
-        {
-          title: 'Auth flow',
+          title: 'Đăng xuất',
           icon: 'lock-closed-outline',
           subtitle: auth.stateStr,
           onPress: showAuthFlow,
-        },
-        {
-          title: 'Hide tabs',
-          icon: 'eye-off-outline',
-          subtitle: 'Pushes Product Page w/out tabs',
-          onPress: showProductPage,
-        },
-        {
-          title: 'Drawer with tabs',
-          icon: 'filter-outline',
-          subtitle: 'Opens drawer app w/ tabs inside',
-          onPress: showDrawerWithTabs,
-        },
-        {
-          title: 'Tabs with drawer',
-          icon: 'log-in-outline',
-          subtitle: 'Opens app w/ 2 tabs and drawer inside one',
-          onPress: showTabsWithDrawer,
-        },
+        }
       ],
     },
   };
@@ -109,7 +65,7 @@ export const Playground: React.FC = observer(() => {
     return keys.map(k => {
       const s = SectionsData[k];
       return (
-        <Section key={k} title={k}>
+        <Section key={k} title={null}>
           {s.content.map(content => {
             return (
               <View key={content.title} marginV-s1>

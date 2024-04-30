@@ -8,7 +8,7 @@ export class AuthStore implements IStore {
 
   // getters
   get stateStr() {
-    return this.state === 'logged-in' ? `Email: ${this.email}\nPress to logout` : 'Press to login';
+    return this.state === 'logged-in' ? `Email: ${this.email}\nBấm để đăng xuất` : 'Bấm để đăng nhập';
   }
 
   // methods

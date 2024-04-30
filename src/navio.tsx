@@ -14,56 +14,26 @@ import {
   getTabBarIcon,
   drawerScreenDefaultOptions,
 } from '@app/utils/designSystem';
-import {services} from '@app/services';
 import {AuthLogin} from './screens/auth/login';
+import { services } from './services';
 
 // NAVIO
 export const navio = Navio.build({
   screens: {
     Main,
     Settings,
-    Example,
 
     Playground,
-    PlaygroundFlashList,
-    PlaygroundExpoImage,
-
-    // for .pushStack example
-    ProductPage: {
-      component: Example,
-      options: {
-        headerShown: false,
-      },
-    },
 
     // for auth flow
     AuthLogin,
   },
   stacks: {
-    MainStack: ['Main', 'Example'],
-    ExampleStack: {
-      screens: ['Example'],
-      navigatorProps: {
-        screenListeners: {
-          focus: () => {},
-        },
-      },
-    },
+    MainStack: ['Main'],
     PlaygroundStack: {
-      screens: ['Playground', 'PlaygroundFlashList', 'PlaygroundExpoImage'],
+      screens: ['Playground'],
     },
-
-    // for .pushStack example
-    ProductPageStack: {
-      screens: ['ProductPage'],
-      containerOptions: {
-        headerShown: true,
-        title: 'Product page',
-      },
-    },
-
-    // for auth flow
-    AuthFlow: ['AuthLogin', 'Example'],
+    AuthFlow: ['AuthLogin'],
   },
   tabs: {
     // main 3 tabs
@@ -72,47 +42,27 @@ export const navio = Navio.build({
         MainTab: {
           stack: 'MainStack',
           options: () => ({
-            title: 'Main',
+            title: 'Trang chủ',
             tabBarIcon: getTabBarIcon('MainTab'),
           }),
         },
         PlaygroundTab: {
           stack: 'PlaygroundStack',
           options: () => ({
-            title: 'Playground',
-            tabBarIcon: getTabBarIcon('PlaygroundTab'),
-          }),
-        },
-        SettingsTab: {
-          stack: ['Settings'],
-          options: () => ({
-            title: services.t.do('settings.title'),
+            title: 'Cài đặt',
             tabBarIcon: getTabBarIcon('SettingsTab'),
-            tabBarBadge: 23,
           }),
         },
+        // SettingsTab: {
+        //   stack: ['Settings'],
+        //   options: () => ({
+        //     title: services.t.do('settings.title'),
+        //     tabBarIcon: getTabBarIcon('SettingsTab'),
+        //     tabBarBadge: 23,
+        //   }),
+        // },
       },
     },
-
-    // tabs with drawer
-    // TabsWithDrawer: {
-    //   layout: {
-    //     MainTab: {
-    //       stack: 'MainStack',
-    //       options: () => ({
-    //         title: 'Main',
-    //         tabBarIcon: getTabBarIcon('MainTab'),
-    //       }),
-    //     },
-    //     PlaygroundTab: {
-    //       drawer: 'DrawerForTabs',
-    //       options: () => ({
-    //         title: 'Playground',
-    //         tabBarIcon: getTabBarIcon('PlaygroundTab'),
-    //       }),
-    //     },
-    //   },
-    // },
   },
   drawers: {
     // main drawer
@@ -135,31 +85,8 @@ export const navio = Navio.build({
         // },
       },
     },
-
-    // drawer inside tabs
-    // DrawerForTabs: {
-    //   layout: {
-    //     FlashList: {
-    //       stack: ['PlaygroundFlashList'],
-    //       options: {
-    //         title: 'Flash List',
-    //         drawerPosition: 'right',
-    //       },
-    //     },
-    //     ExpoImage: {
-    //       stack: ['PlaygroundExpoImage'],
-    //       options: {
-    //         title: 'Expo Image',
-    //         drawerPosition: 'right',
-    //       },
-    //     },
-    //   },
-    // },
   },
-  modals: {
-    ExampleModal: {stack: 'ExampleStack'},
-  },
-  root: 'tabs.AppTabs',
+  // root: 'AuthFlow',
   hooks: [useAppearance],
   defaultOptions: {
     stacks: {

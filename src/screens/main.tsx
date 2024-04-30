@@ -1,112 +1,104 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
-import {Text, View} from 'react-native-ui-lib';
-import Constants from 'expo-constants';
-import * as Application from 'expo-application';
-import {If} from '@kanzitelli/if-component';
-import {observer} from 'mobx-react';
-import {NavioScreen} from 'rn-navio';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Image, Platform, ScrollView } from 'react-native';
+import { Text, View } from 'react-native-ui-lib';
+import { observer } from 'mobx-react';
+import { NavioScreen } from 'rn-navio';
 
-import {services, useServices} from '@app/services';
-import {useStores} from '@app/stores';
-import {Section} from '@app/components/section';
-import {BButton, HeaderButton} from '@app/components/button';
-import {Reanimated2} from '@app/components/reanimated2';
-import {Row} from '@app/components/row';
-import {useAppearance} from '@app/utils/hooks';
-import {NavioSection} from '@app/components/sections/NavioSection';
+import { services, useServices } from '@app/services';
+import { useAppearance } from '@app/utils/hooks';
+import MapView, { Marker } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 
-export const Main: NavioScreen = observer(({}) => {
+const timeInterval = 5 //Call API to up location per 5s
+var centerMapTimeout = null
+
+export const Main: NavioScreen = observer(({ }) => {
   useAppearance();
-  const {counter, ui} = useStores();
-  const {t, api, navio} = useServices();
-  const navigation = navio.useN();
+  const navigation = useNavigation();
 
   // State (local)
   const [loading, setLoading] = useState(false);
+  const [currentInterval, setCurrentInterval] = useState(timeInterval)
+  const [currentPosition, setCurrentPosition] = useState<any>({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  })
 
-  // API Methods
-  const getCounterValue = useCallback(async () => {
-    setLoading(true);
-    try {
-      const {value} = await api.counter.get();
-
-      counter.set('value', value);
-    } catch (e) {
-      console.log('[ERROR]', e);
-    } finally {
-      setLoading(false);
-    }
-  }, [api.counter, counter]);
-
-  // Methods
-  const handleCounterDec = () => counter.set('value', counter.value - 1);
-  const handleCounterInc = () => counter.set('value', counter.value + 1);
-  const handleCounterReset = () => counter.set('value', 0);
-
-  // Start
+  const mapRef = useRef()
   useEffect(() => {
-    configureUI();
-    getCounterValue();
-  }, []);
-
-  // UI Methods
-  const configureUI = () => {
     navigation.setOptions({
-      headerRight: () => (
-        <Row>
-          <HeaderButton onPress={handleCounterDec} label="Dec" />
-          <HeaderButton onPress={handleCounterInc} label="Inc" />
-        </Row>
-      ),
-    });
-  };
+      title: "Vị trí của bạn"
+    })
+  }, [])
+
+  useEffect(() => {
+    let myInterval = setInterval(async () => {
+      if (currentInterval > 0) {
+        setCurrentInterval(currentInterval - 1)
+      }
+      if (currentInterval === 0) {
+        if (currentPosition) {
+          let location = await Location.getCurrentPositionAsync({});
+          setCurrentPosition({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
+
+          mapRef.current.animateToRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude
+          }, 500)
+        }
+        setCurrentInterval(timeInterval)
+      }
+    }, 1000)
+    return () => {
+      clearInterval(myInterval)
+    }
+  })
+  useEffect(() => {
+    (async () => {
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Vui lòng kiểm tra lại cài đặt vị trí của bạn!');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setCurrentPosition(location);
+    })();
+  }, []);
 
   return (
     <View flex bg-bgColor>
-      <ScrollView contentInsetAdjustmentBehavior="always">
-        <NavioSection />
+      <MapView
+        zoomEnabled={true}
+        zoomControlEnabled={true}
+        minZoomLevel={15}
+        maxZoomLevel={20}
+        ref={mapRef}
+        style={{
+          height: '100%'
+        }}
+        initialRegion={currentPosition}
+      >
+        {
+          currentPosition ? (
+            <Marker.Animated
+              coordinate={currentPosition}
+            >
+              <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
+            </Marker.Animated>
+          ) : null
+        }
 
-        <Section title="Expo">
-          <Text text60R textColor>
-            Session ID: {Constants.sessionId}
-          </Text>
-          <Text text60R textColor>
-            App name: {Application.applicationName}
-          </Text>
-        </Section>
-
-        <Section title="Reanimated">
-          <Reanimated2 />
-        </Section>
-
-        <Section title="MobX">
-          <View centerV>
-            <Text marginB-s2 text60R textColor>
-              App launches: {ui.appLaunches}
-            </Text>
-
-            <Text marginB-s2 text60R textColor>
-              Counter:{' '}
-              <If
-                _={loading}
-                _then={<Text textColor>Loading...</Text>}
-                _else={<Text textColor>{counter.value}</Text>}
-              />
-            </Text>
-
-            <Row>
-              <BButton margin-s1 label=" - " onPress={handleCounterDec} />
-              <BButton margin-s1 label=" + " onPress={handleCounterInc} />
-              <BButton margin-s1 label="reset" onPress={handleCounterReset} />
-            </Row>
-          </View>
-        </Section>
-
-        <Section title="API">
-          <BButton margin-s1 label="Update counter value from API" onPress={getCounterValue} />
-        </Section>
-      </ScrollView>
+      </MapView>
     </View>
   );
 });

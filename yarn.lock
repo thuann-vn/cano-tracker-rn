@@ -2464,6 +2464,11 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/geojson@^7946.0.13":
+  version "7946.0.14"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.14.tgz#319b63ad6df705ee2a65a73ef042c8271e696613"
+  integrity sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==
+
 "@types/glob@^7.1.1":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.2.0.tgz#bc1b5bf3aa92f25bd5dd39f35c57361bdce5b2eb"
@@ -5597,6 +5602,11 @@ expo-localization@~14.8.3:
   dependencies:
     rtl-detect "^1.0.2"
 
+expo-location@~16.5.5:
+  version "16.5.5"
+  resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-16.5.5.tgz#3db84f5fecf8cbfdff1e3dbe06fdc823a56bc02c"
+  integrity sha512-dXEd1HaZgdi6yHVF8R+SMnGlKDYrD+Hkkzd/b9edjMSUBLxF2y824AFSSNUf6BVOM53tJBOFEELneXkU1uj9nA==
+
 expo-manifests@~0.13.0:
   version "0.13.2"
   resolved "https://registry.yarnpkg.com/expo-manifests/-/expo-manifests-0.13.2.tgz#02b28bb2fb002ef93a03faf1ede9ecaa43e5d6c0"
@@ -5650,6 +5660,13 @@ expo-structured-headers@~3.7.0:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/expo-structured-headers/-/expo-structured-headers-3.7.2.tgz#2bccba6af090ba2cc82295f7ec695058530b399f"
   integrity sha512-/nGOyeWUXSUy4aIYKJTwQOznRNs0yKqKPAyEE6jtwvOl9qvfDWx9xskNtShioggBhFAssFkV6RBbPn+xZMQtvw==
+
+expo-task-manager@~11.7.3:
+  version "11.7.3"
+  resolved "https://registry.yarnpkg.com/expo-task-manager/-/expo-task-manager-11.7.3.tgz#2d8b0d983e2a73fba4f1f4d65f36ef0db9356ebd"
+  integrity sha512-ueIOi638o+gRYeCIb9GHVEbdIIvAKqAmm4AllcjDJIrmqB240uA+5a5YwfHm7WUrSthIqHlIzLMFcnMTFxf/9w==
+  dependencies:
+    unimodules-app-loader "~4.5.0"
 
 expo-updates-interface@~0.15.1:
   version "0.15.3"
@@ -9681,6 +9698,13 @@ react-native-gesture-handler@~2.14.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-maps@1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.10.0.tgz#1b78270473f4caadc5ff8e8400285b6db9f14e12"
+  integrity sha512-Zs6lHZucEijTwkRVFyInMbPVkJ2UudDEI2fJPc8ArdzdnwDFAdL6OagqTjNRZyI1DBPHRihazfIWpy2+X1VwLg==
+  dependencies:
+    "@types/geojson" "^7946.0.13"
+
 react-native-mmkv@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-2.7.0.tgz#27d7a64b59064edbdf15eef922c5f904a7e36893"
@@ -11385,6 +11409,11 @@ unicorn-magic@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/unicorn-magic/-/unicorn-magic-0.1.0.tgz#1bb9a51c823aaf9d73a8bfcd3d1a23dde94b0ce4"
   integrity sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==
+
+unimodules-app-loader@~4.5.0:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/unimodules-app-loader/-/unimodules-app-loader-4.5.1.tgz#6c8cf83617b6556e99b102fac8a6bbf011abe605"
+  integrity sha512-yQAsoL0jsCjld1C/iWS4tB5a6LZTb8+enZ9mpt9t9zHYw7YZgeInmW7yz5QZAgVE93ZMPN3SudZHWiXGuD4Wfg==
 
 unique-filename@^1.1.1:
   version "1.1.1"

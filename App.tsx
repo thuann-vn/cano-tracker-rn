@@ -14,10 +14,37 @@ import {
   getStatusBarBGColor,
   getStatusBarStyle,
 } from '@app/utils/designSystem';
-import {hydrateStores} from '@app/stores';
+import {hydrateStores, useStores} from '@app/stores';
 import {initServices} from '@app/services';
 import {AppProvider} from '@app/utils/providers';
 import {useAppearance} from '@app/utils/hooks';
+import * as TaskManager from 'expo-task-manager';
+import * as Location from 'expo-location';
+
+const LOCATION_TASK_NAME = 'background-location-task';
+
+const requestPermissions = async () => {
+  const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+  if (foregroundStatus === 'granted') {
+    const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    if (backgroundStatus === 'granted') {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.Balanced,
+      });
+    }
+  }
+};
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+  if (error) {
+    // Error occurred - check `error.message` for more details.
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    // do something with the locations captured in the background
+    console.log(locations);
+  }
+});
 
 LogBox.ignoreLogs([
   'Require',
@@ -27,6 +54,12 @@ LogBox.ignoreLogs([
 export default (): JSX.Element => {
   useAppearance();
   const [ready, setReady] = useState(false);
+  const {auth} = useStores();
+
+  useEffect(() => {
+    requestPermissions();
+  }, [])
+  
 
   // `onLaunch` performs actions that have to be done on app launch before displaying app UI.
   // If you need to make some api requests, load remote config, or some other "heavy" actions, you can use `@app/services/onLaunch.tsx`.
@@ -66,7 +99,7 @@ export default (): JSX.Element => {
 
           // [Tip]
           // You can use `root` to change the root of the app depending on global state changes.
-          // root={isLoggedIn ? 'AuthStack' : 'AppTabs'}
+          root={auth.state != 'logged-in' ? 'stacks.AuthFlow' : 'tabs.AppTabs'}
         />
       </AppProvider>
     </GestureHandlerRootView>
