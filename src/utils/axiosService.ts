@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 const protocolHttps = 'https://'
 //10.0.2.2
-const host = 'my.bamboo-agro.com'
-const isDev = true
+const host = 'canonguyenhien.com'
+const isDev = false
 const devHost = 'https://2422-123-20-226-93.ngrok-free.app'
 let hostURL = isDev ? devHost : `${protocolHttps}${host}`
 let assetURL = `https://` + host;

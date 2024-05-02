@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Expo Starter",
-    "slug": "expo-starter",
+    "name": "Cano Nguyen Hien",
+    "slug": "cano-nguyen-hien",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,15 +10,18 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FAFAFA"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/62b0772c-ef90-4f62-ae7d-a74bfc831f4b"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.batyr.expo-starter",
+      "bundleIdentifier": "io.thua-nguyen.cano-nguyen-hien",
       "plugins": [
         [
           "expo-location",
@@ -28,7 +31,14 @@
         ]
       ],
       "infoPlist": {
-        "UIBackgroundModes": ["location", "fetch", "remote-notification"]
+        "UIBackgroundModes": [
+          "location",
+          "fetch",
+          "remote-notification"
+        ]
+      },
+      "config":{
+        "googleMapsApiKey": "AIzaSyDuwmrdDP-UWCd-bz2_JNPoPZboAMDKshc"
       }
     },
     "android": {
@@ -36,11 +46,26 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "io.batyr.expostarter"
+      "package": "com.ngocthua92.canonguyenhien",
+      "config":{
+        "googleMaps":{
+          "apiKey":  "AIzaSyDuwmrdDP-UWCd-bz2_JNPoPZboAMDKshc"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-localization"]
+    "plugins": [
+      "expo-localization"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "62b0772c-ef90-4f62-ae7d-a74bfc831f4b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }

@@ -6,10 +6,9 @@ import { NavioScreen } from 'rn-navio';
 
 import { services, useServices } from '@app/services';
 import { useAppearance } from '@app/utils/hooks';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Callout, Marker } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
-import { AuthApi } from '@app/services/api/auth';
 import { useStores } from '@app/stores';
 
 const timeInterval = 5 //Call API to up location per 5s
@@ -20,16 +19,10 @@ export const Main: NavioScreen = observer(({ }) => {
   const navigation = useNavigation();
   const { api } = useServices();
   const { auth } = useStores();
-  console.log(auth)
   // State (local)
   const [loading, setLoading] = useState(false);
   const [currentInterval, setCurrentInterval] = useState(timeInterval)
-  const [currentPosition, setCurrentPosition] = useState<any>({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  })
+  const [currentPosition, setCurrentPosition] = useState<any>(null)
   const [users, setUsers] = useState([])
 
   const mapRef = useRef()
@@ -38,10 +31,14 @@ export const Main: NavioScreen = observer(({ }) => {
       title: auth.is_admin ? "Vị trí cano" : "Vị trí của bạn"
     })
 
-    if (auth.is_admin) {
-      fetchUsers()
+    if(mapRef.current){
+      if (auth.is_admin) {
+        fetchUsers()
+      } else {
+        getCurrentPositionAsync();
+      }
     }
-  }, [])
+  }, [mapRef])
 
   useEffect(() => {
     let myInterval = null
@@ -55,23 +52,7 @@ export const Main: NavioScreen = observer(({ }) => {
           setCurrentInterval(currentInterval - 1)
         }
         if (currentInterval === 0) {
-          if (currentPosition) {
-            let location = await Location.getCurrentPositionAsync({});
-            setCurrentPosition({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            });
-
-            mapRef.current.animateToRegion({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude
-            }, 500)
-
-            //Call API
-            updateLocation(location.coords)
-          }
+          getCurrentPositionAsync()
           setCurrentInterval(timeInterval)
         }
       }, 10000)
@@ -81,6 +62,24 @@ export const Main: NavioScreen = observer(({ }) => {
       clearInterval(myInterval)
     }
   })
+
+  const getCurrentPositionAsync = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+
+    setCurrentPosition({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    });
+
+    mapRef.current.fitToCoordinates([
+      location.coords
+    ], {
+      edgePadding: { top: 150, bottom: 150, left: 150, right: 150 }
+    })
+
+    //Call API
+    updateLocation(location.coords)
+  }
 
   //Fetch users locations
   const fetchUsers = async () => {
@@ -117,7 +116,7 @@ export const Main: NavioScreen = observer(({ }) => {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setCurrentPosition(location);
+      setCurrentPosition(location.coords);
     })();
   }, []);
 
@@ -126,35 +125,54 @@ export const Main: NavioScreen = observer(({ }) => {
       <MapView
         zoomEnabled={true}
         zoomControlEnabled={true}
-        minZoomLevel={15}
-        maxZoomLevel={20}
+        minZoomLevel={12}
+        maxZoomLevel={16}
         ref={mapRef}
         style={{
           height: '100%'
         }}
-        initialRegion={currentPosition}
+        initialRegion={{
+          ...currentPosition,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
         provider='google'
+        showsCompass={true}
+        showsBuildings={true}
+        followsUserLocation={true}
       >
         {
-          currentPosition ? (
+          !auth.is_admin && currentPosition ? (
             <Marker.Animated
-              coordinate={currentPosition}
+              coordinate={{
+                latitude: currentPosition.latitude,
+                longitude: currentPosition.longitude,
+              }}
+
             >
               <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
             </Marker.Animated>
           ) : null
         }
-
         {
-          users.filter(user => user.lat && user.lng).map((user, index) => (
+          users.filter(user => user.lat && user.lng && !user.is_admin).map((user, index) => (
             <Marker
-              key={index}
+              key={user.id}
               coordinate={{
                 latitude: parseFloat(user.lat),
                 longitude: parseFloat(user.lng),
               }}
             >
+              <Text center={true}  textAlign="center" style={{fontWeight: "bold"}}>
+                {user.name}
+              </Text>
               <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
+              <Callout>
+                  <View style={{width: 150}}>
+                      <Text>Họ và tên: {user.name}</Text>
+                      <Text>SDT: {user.phone}</Text>
+                  </View>
+              </Callout>
             </Marker>
           ))
         }
