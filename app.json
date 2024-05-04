@@ -13,8 +13,9 @@
       "backgroundColor": "#FAFAFA"
     },
     "updates": {
+      "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0,
+      "fallbackToCacheTimeout": 30000,
       "url": "https://u.expo.dev/62b0772c-ef90-4f62-ae7d-a74bfc831f4b"
     },
     "assetBundlePatterns": [

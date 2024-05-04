@@ -11,11 +11,11 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { useStores } from '@app/stores';
 
-const timeInterval = 10000 //Call API to up location per 5s
+const timeInterval = 5 //Call API to up location per 5s
 
 export const Main: NavioScreen = observer(({ }) => {
   useAppearance();
-  const {ui} = useStores();
+  const { ui } = useStores();
   const navigation = useNavigation();
   const { api } = useServices();
   const { auth } = useStores();
@@ -31,7 +31,7 @@ export const Main: NavioScreen = observer(({ }) => {
       title: auth.is_admin ? "Vị trí cano" : "Vị trí của bạn"
     })
 
-    if(mapRef.current){
+    if (mapRef.current) {
       if (auth.is_admin) {
         fetchUsers()
       } else {
@@ -51,24 +51,25 @@ export const Main: NavioScreen = observer(({ }) => {
         if (currentInterval > 0) {
           setCurrentInterval(currentInterval - 1)
         }
+        getCurrentPositionAsync()
         if (currentInterval === 0) {
-          getCurrentPositionAsync()
           setCurrentInterval(timeInterval)
         }
-      }, 10000)
+      }, 1000)
     }
 
     return () => {
       clearInterval(myInterval)
     }
-  })
+  }, [currentInterval, setCurrentInterval, auth.is_admin])
 
   const getCurrentPositionAsync = async () => {
     let location = await Location.getCurrentPositionAsync({});
 
     setCurrentPosition({
       latitude: location.coords.latitude,
-      longitude: location.coords.longitude
+      longitude: location.coords.longitude,
+      heading: location.coords.heading,
     });
 
     mapRef.current.fitToCoordinates([
@@ -78,7 +79,11 @@ export const Main: NavioScreen = observer(({ }) => {
     })
 
     //Call API
-    updateLocation(location.coords)
+    console.log(currentInterval)
+    if (currentInterval === 0) {
+      console.log('Call API')
+      updateLocation(location.coords)
+    }
   }
 
   //Fetch users locations
@@ -140,6 +145,9 @@ export const Main: NavioScreen = observer(({ }) => {
         showsCompass={true}
         showsBuildings={true}
         followsUserLocation={true}
+        showsScale={true}
+        showsMyLocationButton={true}
+        showsUserLocation={true}
       >
         {
           !auth.is_admin && currentPosition ? (
@@ -148,9 +156,15 @@ export const Main: NavioScreen = observer(({ }) => {
                 latitude: currentPosition.latitude,
                 longitude: currentPosition.longitude,
               }}
-
+              anchor={{ x: 0.5, y: 0.5 }}
             >
-              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40 }} />
+              <Image source={require('../../assets/cano_icon.png')} style={{
+                width: 60,
+                height: 60,
+                transform: [{
+                  rotate: `${currentPosition.heading}deg`
+                }]
+              }} />
             </Marker.Animated>
           ) : null
         }
@@ -161,18 +175,22 @@ export const Main: NavioScreen = observer(({ }) => {
               coordinate={{
                 latitude: parseFloat(user.lat),
                 longitude: parseFloat(user.lng),
-              }} 
-              style={{alignItems: 'center'}}
+              }}
+              style={{ alignItems: 'center' }}
             >
-              <Text center={true}  textAlign="center" style={{fontWeight: "bold"}}>
+              <Text center={true} textAlign="center" style={{ fontWeight: "bold" }}>
                 {user.name}
               </Text>
-              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40, resizeMode: "contain" }} />
+              <Image source={require('../../assets/cano_icon.png')} style={{
+                width: 60,
+                height: 60, 
+                resizeMode: "contain"
+              }} />
               <Callout>
-                  <View style={{width: 200, paddingVertical: 10}}>
-                      <Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{user.name}</Text></Text>
-                      <Text>SDT:  <Text style={{fontWeight: 'bold'}}>{user.phone}</Text></Text>
-                  </View>
+                <View style={{ width: 200, paddingVertical: 10 }}>
+                  <Text>Họ và tên: <Text style={{ fontWeight: 'bold' }}>{user.name}</Text></Text>
+                  <Text>SDT:  <Text style={{ fontWeight: 'bold' }}>{user.phone}</Text></Text>
+                </View>
               </Callout>
             </Marker.Animated>
           ))
