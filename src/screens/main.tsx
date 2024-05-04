@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { useStores } from '@app/stores';
 
-const timeInterval = 5 //Call API to up location per 5s
+const timeInterval = 10000 //Call API to up location per 5s
 
 export const Main: NavioScreen = observer(({ }) => {
   useAppearance();
@@ -84,14 +84,14 @@ export const Main: NavioScreen = observer(({ }) => {
   //Fetch users locations
   const fetchUsers = async () => {
     const users = await api.auth.getUsers()
-    setUsers(users.data)
-    centerMapByCoordinates(users.data)
+    const filteredUsers = users.data.filter((user: { lat: any; lng: any; is_admin: any; }) => user.lat && user.lng && !user.is_admin);
+    setUsers(filteredUsers)
+    centerMapByCoordinates(filteredUsers)
   }
 
   //Make map center
-  const centerMapByCoordinates = (users) => {
-    var markers = users.filter(user => user.lat && user.lng && user.lat > 5)
-    .map(user => ({
+  const centerMapByCoordinates = (users: any[]) => {
+    var markers = users.map((user: { lat: string; lng: string; }) => ({
       latitude: parseFloat(user.lat),
       longitude: parseFloat(user.lng),
     }))
@@ -101,7 +101,7 @@ export const Main: NavioScreen = observer(({ }) => {
   }
 
   //Call API update location
-  const updateLocation = async (location) => {
+  const updateLocation = async (location: { latitude: any; longitude: any; altitude?: number | null; accuracy?: number | null; altitudeAccuracy?: number | null; heading?: number | null; speed?: number | null; }) => {
     api.auth.updateProfile({
       lat: location.latitude,
       lng: location.longitude,
@@ -127,8 +127,6 @@ export const Main: NavioScreen = observer(({ }) => {
       <MapView
         zoomEnabled={true}
         zoomControlEnabled={true}
-        minZoomLevel={12}
-        maxZoomLevel={16}
         ref={mapRef}
         style={{
           height: '100%'
@@ -157,8 +155,8 @@ export const Main: NavioScreen = observer(({ }) => {
           ) : null
         }
         {
-          users.filter(user => user.lat && user.lng && !user.is_admin).map((user, index) => (
-            <Marker
+          users.map((user, index) => (
+            <Marker.Animated
               key={user.id}
               coordinate={{
                 latitude: parseFloat(user.lat),
@@ -169,14 +167,14 @@ export const Main: NavioScreen = observer(({ }) => {
               <Text center={true}  textAlign="center" style={{fontWeight: "bold"}}>
                 {user.name}
               </Text>
-              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40 }} />
+              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40, resizeMode: "contain" }} />
               <Callout>
                   <View style={{width: 200, paddingVertical: 10}}>
                       <Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{user.name}</Text></Text>
                       <Text>SDT:  <Text style={{fontWeight: 'bold'}}>{user.phone}</Text></Text>
                   </View>
               </Callout>
-            </Marker>
+            </Marker.Animated>
           ))
         }
 
