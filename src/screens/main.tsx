@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Image, Platform, ScrollView } from 'react-native';
+import { Alert, Image, Linking, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, View } from 'react-native-ui-lib';
 import { observer } from 'mobx-react';
 import { NavioScreen } from 'rn-navio';
@@ -12,10 +12,10 @@ import * as Location from 'expo-location';
 import { useStores } from '@app/stores';
 
 const timeInterval = 5 //Call API to up location per 5s
-var centerMapTimeout = null
 
 export const Main: NavioScreen = observer(({ }) => {
   useAppearance();
+  const {ui} = useStores();
   const navigation = useNavigation();
   const { api } = useServices();
   const { auth } = useStores();
@@ -90,10 +90,12 @@ export const Main: NavioScreen = observer(({ }) => {
 
   //Make map center
   const centerMapByCoordinates = (users) => {
-    mapRef.current.fitToCoordinates(users.filter(user => user.lat && user.lng).map(user => ({
+    var markers = users.filter(user => user.lat && user.lng && user.lat > 5)
+    .map(user => ({
       latitude: parseFloat(user.lat),
       longitude: parseFloat(user.lng),
-    })), {
+    }))
+    mapRef.current.fitToCoordinates(markers, {
       edgePadding: { top: 150, bottom: 150, left: 150, right: 150 }
     })
   }
@@ -150,7 +152,7 @@ export const Main: NavioScreen = observer(({ }) => {
               }}
 
             >
-              <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
+              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40 }} />
             </Marker.Animated>
           ) : null
         }
@@ -161,16 +163,17 @@ export const Main: NavioScreen = observer(({ }) => {
               coordinate={{
                 latitude: parseFloat(user.lat),
                 longitude: parseFloat(user.lng),
-              }}
+              }} 
+              style={{alignItems: 'center'}}
             >
               <Text center={true}  textAlign="center" style={{fontWeight: "bold"}}>
                 {user.name}
               </Text>
-              <Image source={require('../../assets/location_icon.png')} style={{ width: 40, height: 40 }} />
+              <Image source={require('../../assets/cano_icon.png')} style={{ width: 40, height: 40 }} />
               <Callout>
-                  <View style={{width: 150}}>
-                      <Text>Họ và tên: {user.name}</Text>
-                      <Text>SDT: {user.phone}</Text>
+                  <View style={{width: 200, paddingVertical: 10}}>
+                      <Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{user.name}</Text></Text>
+                      <Text>SDT:  <Text style={{fontWeight: 'bold'}}>{user.phone}</Text></Text>
                   </View>
               </Callout>
             </Marker>

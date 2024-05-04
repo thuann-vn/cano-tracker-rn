@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
 import { View, Text, Colors } from 'react-native-ui-lib';
 import { observer } from 'mobx-react';
 import { NavioScreen } from 'rn-navio';
@@ -10,15 +9,16 @@ import { useServices } from '@app/services';
 import { useAppearance } from '@app/utils/hooks';
 import { BButton } from '@app/components/button';
 import { useNavigation } from '@react-navigation/native';
+import { TextInput } from 'react-native-gesture-handler';
 
 export type Props = {
   type?: 'push';
 };
 
 export const AuthLogin: NavioScreen<Props> = observer(({ type = 'push' }) => {
-  useAppearance(); // for Dark Mode
+  const {appearance} = useAppearance(); // for Dark Mode
   const { t, navio, api } = useServices();
-  const { auth } = useStores();
+  const { auth, ui } = useStores();
   const navigation = useNavigation();
 
   // State
@@ -55,6 +55,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({ type = 'push' }) => {
 
   // Methods
   const configureUI = () => {
+    ui.set('appearance', 'light');
     navigation.setOptions({
       title: "Đăng nhập"
     });
@@ -79,6 +80,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({ type = 'push' }) => {
                   onChangeText={setEmail}
                   keyboardType="phone-pad"
                   inputMode="numeric"
+                  placeholderTextColor={Colors.grey40}
                 />
               </View>
 
@@ -93,6 +95,7 @@ export const AuthLogin: NavioScreen<Props> = observer(({ type = 'push' }) => {
                   onChangeText={setPassword}
                   keyboardType="visible-password"
                   secureTextEntry
+                  placeholderTextColor={Colors.grey40}
                 />
               </View>
             </View>
