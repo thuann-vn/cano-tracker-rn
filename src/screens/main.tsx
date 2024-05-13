@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Image, Linking, Platform, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, View } from 'react-native-ui-lib';
+import { Colors, Text, View } from 'react-native-ui-lib';
 import { observer } from 'mobx-react';
 import { NavioScreen } from 'rn-navio';
 
@@ -10,6 +10,7 @@ import MapView, { Callout, Marker } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { useStores } from '@app/stores';
+import { Icon } from '@app/components/icon';
 
 const timeInterval = 5 //Call API to up location per 5s
 
@@ -28,7 +29,7 @@ export const Main: NavioScreen = observer(({ }) => {
   const mapRef = useRef()
   useEffect(() => {
     navigation.setOptions({
-      title: auth.is_admin ? "Vị trí cano" : "Vị trí của bạn"
+      title: auth.is_admin ? "CANO NGUYỄN HIỀN" : "CANO NGUYỄN HIỀN"
     })
 
     if (mapRef.current) {
@@ -132,6 +133,7 @@ export const Main: NavioScreen = observer(({ }) => {
       <MapView
         zoomEnabled={true}
         zoomControlEnabled={true}
+        zoomTapEnabled={true}
         ref={mapRef}
         style={{
           height: '100%'
@@ -146,8 +148,6 @@ export const Main: NavioScreen = observer(({ }) => {
         showsBuildings={true}
         followsUserLocation={true}
         showsScale={true}
-        showsMyLocationButton={true}
-        showsUserLocation={true}
       >
         {
           !auth.is_admin && currentPosition ? (
@@ -160,10 +160,11 @@ export const Main: NavioScreen = observer(({ }) => {
             >
               <Image source={require('../../assets/cano_icon.png')} style={{
                 width: 60,
-                height: 60,
-                transform: [{
-                  rotate: `${currentPosition.heading}deg`
-                }]
+                height: 30,
+                resizeMode: "contain"
+                // transform: [{
+                //   rotate: `${currentPosition.heading}deg`
+                // }]
               }} />
             </Marker.Animated>
           ) : null
@@ -177,19 +178,28 @@ export const Main: NavioScreen = observer(({ }) => {
                 longitude: parseFloat(user.lng),
               }}
               style={{ alignItems: 'center' }}
+              onCalloutPress={() => Linking.openURL('tel://' + user.phone)}
             >
-              <Text center={true} textAlign="center" style={{ fontWeight: "bold" }}>
+              <Text center={true} textAlign="center" style={{ fontWeight: "bold", color: '#4155FF' }}>
                 {user.name}
               </Text>
               <Image source={require('../../assets/cano_icon.png')} style={{
                 width: 60,
-                height: 60, 
+                height: 30,
                 resizeMode: "contain"
               }} />
-              <Callout>
+              <Callout onPress={() => {
+                Linking.openURL('tel://' + user.phone)
+              }}>
                 <View style={{ width: 200, paddingVertical: 10 }}>
-                  <Text>Họ và tên: <Text style={{ fontWeight: 'bold' }}>{user.name}</Text></Text>
-                  <Text>SDT:  <Text style={{ fontWeight: 'bold' }}>{user.phone}</Text></Text>
+                  <View style={{ alignItems: 'center', flexDirection: 'row', marginBottom: 10 }}>
+                    <Icon name='person-circle' color={Colors.grey40} />
+                    <Text style={{ fontWeight: 'bold', marginLeft: 5, color: '#4155FF' }}>{user.name}</Text>
+                  </View>
+                  <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                    <Icon name='phone-portrait-outline' color={Colors.grey40} />
+                    <Text style={{ fontWeight: 'bold', marginLeft: 5, color: '#4155FF' }}>{user.phone}</Text>
+                  </View>
                 </View>
               </Callout>
             </Marker.Animated>

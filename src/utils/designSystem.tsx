@@ -15,7 +15,7 @@ import {Appearance} from '@app/utils/types/enums';
 // =============
 
 const colors = {
-  primary: '#5383b8', // blue
+  primary: '#4155FF', // blue
   secondary: '#469c57', // green
   accent: '#fed330', // yellow
   _black: Colors.rgba(20, 20, 20, 1),
@@ -137,14 +137,14 @@ export const getHeaderBlurEffect = (): 'regular' | 'light' | 'dark' => {
 // Default options
 export const screenDefaultOptions = (): NativeStackNavigationOptions => ({
   headerShadowVisible: false,
-  headerTintColor: Colors.primary,
+  headerTintColor: Colors.white,
+  headerStyle: {backgroundColor: '#4155FF'},
 
   // this setup makes large title work on iOS
   ...Platform.select({
     ios: {
       headerLargeTitle: false,
-      headerTransparent: true,
-      headerBlurEffect: getHeaderBlurEffect(), // this sets up blurred nav bar
+      headerTransparent: false,
       // if you'd like to have a solid color for a nav bar, then you should
       // set up `headerStyle: {backgroundColor: Colors.bg2Color}`
     },

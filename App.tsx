@@ -23,7 +23,7 @@ import * as Location from 'expo-location';
 import axiosService from '@app/utils/axiosService';
 
 const LOCATION_TASK_NAME = 'background-location-task';
-
+var lastLocationUpdate = new Date().getTime();
 const requestPermissions = async () => {
   const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
   if (foregroundStatus === 'granted') {
@@ -44,11 +44,19 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (data) {
     const { locations } = data;
     // do something with the locations captured in the background
+    if(lastLocationUpdate + 5000 > new Date().getTime()) {
+      return;
+    }
     console.log('locations',locations);
+    lastLocationUpdate = new Date().getTime();
     axiosService.post('member/update', {
       lat: locations[0].coords.latitude,
       lng: locations[0].coords.longitude
-    });
+    }).then(res => {
+      console.log('res',res);
+    }).catch(err => {
+      console.log('err',err);
+    })
   }
 });
 
